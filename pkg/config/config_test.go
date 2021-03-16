@@ -26,7 +26,7 @@ b:
 		},
 	}
 
-	err := Unmarshal(configYaml, &got)
+	err := Unmarshal(&got, RawConfigOption(configYaml))
 	if err != nil {
 		t.Errorf("failed to parse config: %v", err)
 	}

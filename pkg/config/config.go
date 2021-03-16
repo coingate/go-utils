@@ -9,7 +9,12 @@ import (
 )
 
 // Unmarshal parses and unmarshals configuration files and env variables into provided interface.
-func Unmarshal(data []byte, v interface{}) error {
+func Unmarshal(v interface{}, options ...ConfigOption) error {
+	config, err := parseConfigOptions(options...)
+	if err != nil {
+		return err
+	}
+
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
@@ -17,8 +22,8 @@ func Unmarshal(data []byte, v interface{}) error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
 
-	if data != nil {
-		err := viper.ReadConfig(bytes.NewBuffer(data))
+	if config.RawConfig != nil {
+		err := viper.ReadConfig(bytes.NewBuffer(config.RawConfig))
 		if err != nil {
 			return fmt.Errorf("failed to provided config: %v", err)
 		}
@@ -40,4 +45,17 @@ func Unmarshal(data []byte, v interface{}) error {
 	}
 
 	return nil
+}
+
+func parseConfigOptions(options ...ConfigOption) (*Config, error) {
+	config := &Config{}
+
+	for _, op := range options {
+		err := op(config)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse config's configuration")
+		}
+	}
+
+	return config, nil
 }
