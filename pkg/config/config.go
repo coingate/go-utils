@@ -8,6 +8,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	defaultConfigName = "config"
+)
+
 // Unmarshal parses and unmarshals configuration files and env variables into provided interface.
 func Unmarshal(v interface{}, options ...ConfigOption) error {
 	config, err := parseConfigOptions(options...)
@@ -15,11 +19,15 @@ func Unmarshal(v interface{}, options ...ConfigOption) error {
 		return err
 	}
 
+	if config.ConfigName != "" {
+		defaultConfigName = config.ConfigName
+	}
+
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.AddConfigPath(".")
-	viper.SetConfigName("config")
+	viper.SetConfigName(defaultConfigName)
 	viper.SetConfigType("yml")
 
 	if config.RawConfig != nil {
