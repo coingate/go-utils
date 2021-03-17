@@ -10,7 +10,7 @@ type ifaceProcesser interface {
 	process(string) error
 }
 
-// traverseIface traverses interface and executes processIface on given non-structural interface
+// traverseIface traverses interface and executes processIface on given non-structural interface.
 func traverseIface(processor ifaceProcesser, iface interface{}, parts ...string) error {
 	ifv := reflect.ValueOf(iface)
 	ift := reflect.TypeOf(iface)
